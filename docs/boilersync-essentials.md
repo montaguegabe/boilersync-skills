@@ -30,9 +30,8 @@ Use `boilersync --help` and subcommand `--help` for flags.
 ## Template Reference Formats
 
 - `org/repo#subdir`
-- `https://host/org/repo.git#subdir`
-- `git@host:org/repo.git#subdir`
-- legacy local names (deprecated)
+- `https://github.com/org/repo#subdir`
+- `https://github.com/org/repo.git#subdir`
 
 Default template cache:
 
@@ -46,9 +45,24 @@ Override with:
 BOILERSYNC_TEMPLATE_DIR=/custom/path
 ```
 
+GitHub is the only supported host for URL references.
+
 ## Project Metadata
 
 After `init` and `pull`, BoilerSync writes `.boilersync` metadata to project roots so future operations can resolve template provenance.
+Canonical `.boilersync` shape:
+
+```json
+{
+  "template": "https://github.com/org/repo.git#subdir",
+  "name_snake": "project_name",
+  "name_pretty": "Project Name",
+  "variables": {},
+  "children": []
+}
+```
+
+`source` metadata is no longer used.
 
 ## Template Authoring (Canonical)
 

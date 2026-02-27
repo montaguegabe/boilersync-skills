@@ -39,14 +39,28 @@ boilersync push
 Preferred source-qualified references:
 
 - `org/repo#subdir`
-- `https://host/org/repo.git#subdir`
-- `git@host:org/repo.git#subdir`
+- `https://github.com/org/repo#subdir`
+- `https://github.com/org/repo.git#subdir`
 
 Template cache root defaults to `~/.boilersync/templates` (or `BOILERSYNC_TEMPLATE_DIR`).
+GitHub is the only supported host for URL references.
 
 ## Project Tracking
 
 BoilerSync writes `.boilersync` metadata in project roots after scaffold/pull so future operations can resolve template provenance.
+Canonical `.boilersync` shape:
+
+```json
+{
+  "template": "https://github.com/org/repo.git#subdir",
+  "name_snake": "project_name",
+  "name_pretty": "Project Name",
+  "variables": {},
+  "children": []
+}
+```
+
+`source` metadata is no longer used.
 
 ## Template Authoring (Canonical)
 
