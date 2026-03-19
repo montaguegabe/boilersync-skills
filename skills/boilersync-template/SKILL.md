@@ -34,6 +34,27 @@ boilersync push
 - `boilersync push`: promote committed project changes back to template source
 - `boilersync templates init`: clone/register template source repos into local cache
 
+## Non-Interactive Init (Agents/CI)
+
+`boilersync init` supports non-interactive mode via `--non-interactive` (alias: `--no-input`).
+
+Use this pattern when an AI agent or CI job must never block on prompts:
+
+```bash
+boilersync init your-org/your-templates#python/service-template \
+  --non-interactive \
+  --name my_service \
+  --pretty-name "My Service" \
+  --var author_name="Jane Doe" \
+  --var author_email="jane@example.com"
+```
+
+Rules:
+
+- Include `--non-interactive` for unattended execution.
+- Provide required template variables with one or more `--var KEY=VALUE` flags.
+- If a required variable is missing in non-interactive mode, BoilerSync exits with an error instead of prompting.
+
 ## Template References
 
 Preferred source-qualified references:

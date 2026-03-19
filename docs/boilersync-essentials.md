@@ -27,6 +27,27 @@ boilersync push
 
 Use `boilersync --help` and subcommand `--help` for flags.
 
+## Non-Interactive Init (Agents/CI)
+
+`boilersync init` supports non-interactive mode via `--non-interactive` (alias: `--no-input`).
+
+Use this pattern for AI agents and CI:
+
+```bash
+boilersync init your-org/your-templates#python/service-template \
+  --non-interactive \
+  --name my_service \
+  --pretty-name "My Service" \
+  --var author_name="Jane Doe" \
+  --var author_email="jane@example.com"
+```
+
+Rules:
+
+- Include `--non-interactive` for unattended execution.
+- Pass required template variables via `--var KEY=VALUE`.
+- If required variables are missing in non-interactive mode, BoilerSync exits with an error instead of prompting.
+
 ## Template Reference Formats
 
 - `org/repo#subdir`
