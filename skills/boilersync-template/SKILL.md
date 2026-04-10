@@ -33,18 +33,25 @@ boilersync push
 - `boilersync pull [TEMPLATE_REF]`: apply template changes to an existing project
 - `boilersync push`: promote committed project changes back to template source
 - `boilersync templates init`: clone/register template source repos into local cache
+- `boilersync templates details TEMPLATE_REF [--json]`: inspect effective template inputs after inheritance is resolved
 
 ## Non-Interactive Init (Agents/CI)
 
 `boilersync init` supports non-interactive mode via `--non-interactive` (alias: `--no-input`).
+
+Before unattended init, inspect the template inputs:
+
+```bash
+boilersync templates details your-org/your-templates#python/service-template --json
+```
 
 Use this pattern when an AI agent or CI job must never block on prompts:
 
 ```bash
 boilersync init your-org/your-templates#python/service-template \
   --non-interactive \
-  --name my_service \
-  --pretty-name "My Service" \
+  --var name_snake=my_service \
+  --var name_pretty="My Service" \
   --var author_name="Jane Doe" \
   --var author_email="jane@example.com"
 ```
@@ -52,6 +59,7 @@ boilersync init your-org/your-templates#python/service-template \
 Rules:
 
 - Include `--non-interactive` for unattended execution.
+- Pass project naming through normal template variables such as `name_snake` and `name_pretty`.
 - Provide required template variables with one or more `--var KEY=VALUE` flags.
 - If a required variable is missing in non-interactive mode, BoilerSync exits with an error instead of prompting.
 

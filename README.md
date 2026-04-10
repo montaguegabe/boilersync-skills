@@ -20,7 +20,3 @@ Optional flags:
 ## Included Skills
 
 - `boilersync-template` - BoilerSync template authoring and CLI lifecycle guidance
-
-## Docs
-
-- [docs/boilersync-essentials.md](docs/boilersync-essentials.md) - BoilerSync workflow essentials and template authoring reference
