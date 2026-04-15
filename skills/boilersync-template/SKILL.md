@@ -20,6 +20,11 @@ boilersync templates init https://github.com/your-org/your-templates.git
 # Initialize a project from a source-qualified template
 boilersync init your-org/your-templates#python/service-template
 
+# Initialize a well-defaulted template without prompts
+mkdir my-app-workspace
+cd my-app-workspace
+boilersync init your-org/your-templates#python/service-template --non-interactive
+
 # Pull template updates later
 boilersync pull
 
@@ -30,6 +35,7 @@ boilersync push
 ## CLI Essentials
 
 - `boilersync init TEMPLATE_REF`: first-time project generation (empty target directory)
+- `boilersync init TEMPLATE_REF --non-interactive`: generate without prompts when the template supplies defaults for every required variable
 - `boilersync pull [TEMPLATE_REF]`: apply template changes to an existing project
 - `boilersync push`: promote committed project changes back to template source
 - `boilersync templates init`: clone/register template source repos into local cache
@@ -61,6 +67,7 @@ Rules:
 - Include `--non-interactive` for unattended execution.
 - Pass project naming through normal template variables such as `name_snake` and `name_pretty`.
 - Provide required template variables with one or more `--var KEY=VALUE` flags.
+- Prefer `template.json` `defaults` for values that can be derived from project naming, so agents and CI can use fewer `--var` flags.
 - If a required variable is missing in non-interactive mode, BoilerSync exits with an error instead of prompting.
 
 ## Template References
@@ -93,9 +100,6 @@ Canonical `.boilersync` shape:
 
 ## Template Authoring (Canonical)
 
-The section below is copied from:
-`/Users/gabemontague/.boilersync/templates/openbase-community/templates/CLAUDE.md`
-
 # Boilersync Templates Directory
 
 This directory contains project templates for generating new codebases with boilersync.
@@ -108,7 +112,7 @@ To create a new boilersync template, create a template directory here with your 
 ./my-template/
 ├── ... (template files) ...
 ├── README.starter.md
-└── template.json          # Optional, for inheritance
+└── template.json          # Required template metadata
 ```
 
 ## Template Syntax
@@ -173,6 +177,69 @@ Use `template.json` to extend another template:
 ```
 
 Child templates inherit all files from the parent.
+
+## Runtime Metadata (`template.json`)
+
+In addition to inheritance, `template.json` can define defaults and runtime behavior:
+
+- `defaults`: default values for interpolation variables, applied before missing-variable collection
+- `children`: initialize child templates during `boilersync init`
+- `hooks`: run shell commands with `pre_init` and `post_init`
+- `github`: optional GitHub repository creation settings
+- `skip_git`: skip local git initialization when true
+
+Template defaults may be literal values or `$${...}` / Jinja-rendered strings. Existing values win, so explicit `--var` values, saved project metadata, and earlier inherited-template defaults are not overwritten. Defaults are saved into generated project `.boilersync` metadata after init or pull.
+
+Useful default patterns:
+
+```json
+{
+  "defaults": {
+    "api_package_name": "$${name_snake}_api",
+    "django_app_name": "$${name_snake}",
+    "web_package_name": "$${name_kebab}-web",
+    "api_client_package_name": "$${name_kebab}-api-client",
+    "api_client_export_name": "$${name_camel}",
+    "cdn_base_url": "https://cdn.openbase.app/$${name_kebab}/",
+    "with_frontend": true
+  }
+}
+```
+
+BoilerSync infers the default project name from the target folder. A trailing `-workspace` / `_workspace` suffix is stripped, so `woo-score-workspace` defaults to `name_snake=woo_score`. Override with `--var name_snake=...` when needed.
+
+If a template references `github_user` and the value is not supplied, BoilerSync tries `gh api user --jq .login`. If the GitHub CLI is unavailable or unauthenticated, `github_user` remains a required variable and interactive prompting or `--var github_user=...` is still needed.
+
+Hook step fields:
+
+- `id` (optional): log identifier
+- `run` (required): shell command to execute
+- `condition` (optional): boolean expression to gate execution
+- `cwd` (optional): working directory relative to target directory
+- `env` (optional): env var map; values support `$${...}` interpolation
+- `allow_failure` (optional): continue on non-zero exit code when true
+
+Example:
+
+```json
+{
+  "hooks": {
+    "pre_init": [
+      {
+        "id": "deps",
+        "run": "uv sync"
+      }
+    ],
+    "post_init": [
+      {
+        "id": "format",
+        "run": "uv run ruff format .",
+        "allow_failure": true
+      }
+    ]
+  }
+}
+```
 
 ### Block Overrides
 
