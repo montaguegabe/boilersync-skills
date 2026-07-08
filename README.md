@@ -8,8 +8,8 @@ Vercel Skills repository for BoilerSync.
 # List available skills
 npx skills add montaguegabe/boilersync-skills --list
 
-# Install the BoilerSync template skill
-npx skills add montaguegabe/boilersync-skills --skill boilersync-template
+# Install the BoilerSync skill
+npx skills add montaguegabe/boilersync-skills --skill boilersync
 ```
 
 Optional flags:
@@ -19,4 +19,5 @@ Optional flags:
 
 ## Included Skills
 
-- `boilersync-template` - BoilerSync template authoring and CLI lifecycle guidance
+- `boilersync` - BoilerSync template authoring and CLI lifecycle guidance
+- `updating-high-prio-projects` - Workflow for updating prioritized BoilerSync downstream projects with pull proposals and manual review

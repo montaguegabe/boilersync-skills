@@ -1,5 +1,5 @@
 ---
-name: boilersync-template
+name: boilersync
 description: >-
   Use this skill when users ask about BoilerSync template creation,
   template syntax, .starter or .boilersync files, template inheritance,
@@ -7,7 +7,7 @@ description: >-
 version: 0.1.0
 ---
 
-# BoilerSync Template
+# BoilerSync Templating/Scaffolding
 
 BoilerSync scaffolds projects from templates and keeps template and project evolution in sync with `init`, `pull`, and `push`.
 
@@ -25,8 +25,14 @@ mkdir my-app-workspace
 cd my-app-workspace
 boilersync init your-org/your-templates#python/service-template --non-interactive
 
-# Pull template updates later
+# Inspect project drift from the rendered upstream template
+boilersync diff
+
+# Pull template updates later, for simple/low-risk projects
 boilersync pull
+
+# Create a reviewable proposed pull without mutating the project
+boilersync pull-proposal create
 
 # Push committed project changes back to template source
 boilersync push
@@ -36,10 +42,23 @@ boilersync push
 
 - `boilersync init TEMPLATE_REF`: first-time project generation (empty target directory)
 - `boilersync init TEMPLATE_REF --non-interactive`: generate without prompts when the template supplies defaults for every required variable
+- `boilersync check-pull`: compare the project's recorded template commit with the current cached template source HEAD
+- `boilersync diff [--json|--patch|--name-status] [--include-starter] [--children|--recursive]`: render the upstream template with saved project variables and compare it to the current project
 - `boilersync pull [TEMPLATE_REF]`: apply template changes to an existing project
+- `boilersync pull-proposal create [--json] [--workspace-dir DIR]`: create a temp git repo containing proposed pull changes for review
+- `boilersync pull-proposal apply-file PROPOSAL_DIR PATH`: copy one proposed file into the current project
+- `boilersync pull-proposal apply-patch PATCH`: apply selected hunks from a saved patch
 - `boilersync push`: promote committed project changes back to template source
 - `boilersync templates init`: clone/register template source repos into local cache
 - `boilersync templates details TEMPLATE_REF [--json]`: inspect effective template inputs after inheritance is resolved
+
+## Diff, Pull, And Pull Proposals
+
+Use `boilersync diff` before changing a mature downstream project. The command renders the upstream template with the project's saved `.boilersync` variables, respects git-visible files/ignore rules, excludes `.starter` outputs by default, and treats registered `children` as separate template instantiations. Add `--include-starter` only when deliberately reviewing starter-derived files.
+
+Use direct `boilersync pull` for fresh, simple, or low-risk downstreams where applying the template update directly is acceptable.
+
+For customized downstreams, prefer `boilersync pull-proposal create`. It works in a temporary copy, leaves the real project untouched, and lets an agent or human apply only safe pieces with `apply-file`, selected hunks with `apply-patch`, or manual edits.
 
 ## Non-Interactive Init (Agents/CI)
 
